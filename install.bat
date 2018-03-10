@@ -1,0 +1,2 @@
+npm i
+bower i

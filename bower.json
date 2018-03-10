@@ -1,0 +1,20 @@
+{
+  "name": "nii.gulp",
+  "description": "gulp package by niilka",
+  "main": "",
+  "authors": [
+    "niilka"
+  ],
+  "license": "ISC",
+  "homepage": "niilka.pw",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+
+  }
+}
