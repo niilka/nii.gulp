@@ -30,7 +30,7 @@ const path = {
     svg: 'build/img/icons/svg/'
   },
   src: {
-    html: 'src/html/**/*.pug',
+    html: 'src/html/*.pug',
     js: 'src/js/main.js',
     style: 'src/style/main.scss',
     img: 'src/img/**/*.*',
