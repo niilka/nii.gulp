@@ -1,11 +1,12 @@
 'use strict';
 
-const CSS_MINIFY = true;
+// Подключаемые модули
 
-const gulp = require('gulp'),
+const
+  gulp = require('gulp'),
   watch = require('gulp-watch'),
   prefixer = require('gulp-autoprefixer'),
-  uglify = require('gulp-uglify'),
+  uglify = require('gulp-uglify-es').default,
   sass = require('gulp-sass'),
   sourcemaps = require('gulp-sourcemaps'),
   rigger = require('gulp-rigger'),
@@ -19,6 +20,8 @@ const gulp = require('gulp'),
   rename = require('gulp-rename'),
   csscomb = require('gulp-csscomb'),
   reload = browserSync.reload;
+
+// Указываем пути для сбилженых, еще не сбилженых и файлов за которыми стоит следить
 
 const path = {
   build: {
@@ -48,63 +51,53 @@ const path = {
   clean: './build'
 };
 
+// Конфигурация веб сервера
+
 const config = {
   server: {
-    baseDir: "./build"
+    baseDir: "./build",
   },
   tunnel: true,
   host: 'localhost',
   port: 9000,
-  logPrefix: "nii.gulp"
+  logPrefix: "nii.gulp",
+  notify: false,
+  open: false
 };
 
-gulp.task('html:build', () => {
-  gulp.src(path.src.html)
-    .pipe(rigger())
-    .pipe(gulp.dest(path.build.html))
-    .pipe(reload({
-      stream: true
-    }));
-});
+// Билдим js
 
 gulp.task('js:build', () => {
   gulp.src(path.src.js)
     .pipe(rigger())
     .pipe(sourcemaps.init())
-    .pipe(uglify())
     .pipe(sourcemaps.write())
+    .pipe(uglify())
     .pipe(gulp.dest(path.build.js))
     .pipe(reload({
       stream: true
     }));
 });
 
+// Билдим стили
+
 gulp.task('style:build', () => {
-  if (CSS_MINIFY) {
-    gulp.src(path.src.style)
-      .pipe(sourcemaps.init())
-      .pipe(sass())
-      .pipe(prefixer())
-      .pipe(csscomb())
-      .pipe(cssmin())
-      .pipe(sourcemaps.write())
-      .pipe(gulp.dest(path.build.css))
-      .pipe(reload({
-        stream: true
-      }));
-  } else {
-    gulp.src(path.src.style)
-      .pipe(sourcemaps.init())
-      .pipe(sass())
-      .pipe(prefixer())
-      .pipe(csscomb())
-      .pipe(sourcemaps.write())
-      .pipe(gulp.dest(path.build.css))
-      .pipe(reload({
-        stream: true
-      }));
-  }
+  gulp.src(path.src.style)
+    .pipe(sourcemaps.init())
+    .pipe(sass())
+    .pipe(prefixer({
+      browsers: ['last 15 versions']
+    }))
+    .pipe(csscomb())
+    .pipe(cssmin())
+    .pipe(sourcemaps.write())
+    .pipe(gulp.dest(path.build.css))
+    .pipe(reload({
+      stream: true
+    }));
 });
+
+// Билдим html
 
 gulp.task('html:build', () => {
   return gulp.src(path.src.html)
@@ -116,6 +109,8 @@ gulp.task('html:build', () => {
       stream: true
     }));
 });
+
+// Сжимаем картинки
 
 gulp.task('image:build', () => {
   gulp.src(path.src.img)
@@ -133,10 +128,14 @@ gulp.task('image:build', () => {
     }));
 });
 
+// Переносим шрифты
+
 gulp.task('fonts:build', () => {
   gulp.src(path.src.fonts)
     .pipe(gulp.dest(path.build.fonts))
 });
+
+// Создаем SVG спрайт
 
 gulp.task('svg:build', () => {
   return gulp
@@ -148,6 +147,8 @@ gulp.task('svg:build', () => {
     .pipe(gulp.dest(path.build.svg))
 });
 
+// Общий таск билда всего
+
 gulp.task('build', [
   'html:build',
   'js:build',
@@ -155,6 +156,8 @@ gulp.task('build', [
   'fonts:build',
   'image:build'
 ]);
+
+// Смотрящий
 
 gulp.task('watch', () => {
   watch([path.watch.html], (event, cb) => {
@@ -177,12 +180,18 @@ gulp.task('watch', () => {
   });
 });
 
+// Запуск веб сервера
+
 gulp.task('webserver', () => {
   browserSync(config);
 });
 
+// Чистим чистим
+
 gulp.task('clean', (cb) => {
   rimraf(path.clean, cb);
 });
+
+// И то что по стандарту
 
 gulp.task('default', ['build', 'webserver', 'watch']);
